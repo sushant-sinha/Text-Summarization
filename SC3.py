@@ -112,8 +112,8 @@ print(' ')
 print(' ')
 print("The summary:",' ')
 print(' ')
-print('\n'.join(np.array(sentences)[top_sentence_indices]))
-print(' ')
+final_summary='\n'.join(np.array(sentences)[top_sentence_indices])
+print(final_summary)
 L2=len('\n'.join(np.array(sentences)[top_sentence_indices]))
 c2=0
 for i in range (0,L2):
@@ -121,7 +121,6 @@ for i in range (0,L2):
         c2=c2+1
 print("Length of summary=",c2," words")
 
-from rouge import Rouge
 human_summary="""
 The Kyrgyz Republic, a small, mountainous state of the former Soviet republic, is using invisible ink and ultraviolet readers in the country's elections as part of a drive to
 prevent multiple voting. In an effort to live up to its reputation in the 1990s as "an island of democracy", the Kyrgyz President, Askar Akaev, pushed through the law requiring
@@ -130,14 +129,43 @@ elections - the German Embassy, the Soros Foundation and the Kyrgyz government h
 one election official will scan voter's fingers with UV lamp before allowing them to enter, and every voter will have his/her left thumb sprayed with ink before receiving the
 ballot.
 """;
-hypothesis = '\n'.join(np.array(sentences)[top_sentence_indices])
-reference =human_summary
-rouge = Rouge()
-scores = rouge.get_scores(hypothesis, reference)
-print(scores)
+# from rouge import Rouge
+# hypothesis = '\n'.join(np.array(sentences)[top_sentence_indices])
+# reference =human_summary
+# rouge = Rouge()
+# scores = rouge.get_scores(hypothesis, reference)
+# print(scores)
 
-from rouge_score import rouge_scorer
+# from rouge_score import rouge_scorer
 
-scorer = rouge_scorer.RougeScorer(['rouge1','rouge2','rougeL'], use_stemmer=True)
-score = scorer.score(hypothesis,reference)
-print(score)
+# scorer = rouge_scorer.RougeScorer(['rouge1','rouge2','rougeL'], use_stemmer=True)
+# score = scorer.score(hypothesis,reference)
+# print(score)
+
+from nltk.corpus import stopwords 
+from nltk.tokenize import word_tokenize 
+  
+X = DOCUMENT.lower() 
+Y = final_summary.lower() 
+   
+X_list = word_tokenize(X)  
+Y_list = word_tokenize(Y) 
+  
+sw = stopwords.words('english')  
+l1 =[];l2 =[] 
+   
+X_set = {w for w in X_list if not w in sw}  
+Y_set = {w for w in Y_list if not w in sw} 
+    
+rvector = X_set.union(Y_set)  
+for w in rvector: 
+    if w in X_set: l1.append(1)
+    else: l1.append(0) 
+    if w in Y_set: l2.append(1) 
+    else: l2.append(0) 
+c = 0
+    
+for i in range(len(rvector)): 
+        c+= l1[i]*l2[i] 
+cosine = c / float((sum(l1)*sum(l2))**0.5) 
+print("similarity: ", cosine)
